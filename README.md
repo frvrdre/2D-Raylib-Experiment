@@ -1,19 +1,18 @@
-# Block Dodge
+# Gameplay Systems
 
-A simple 2D dodge game built using C++20 and raylib as part of my journey learning C++ and game development.
+A small 2D game prototype built with C++20 and raylib as part of my journey learning C++ and game development.
 
-The aim is to avoid falling blocks while practising movement, collision detection and basic game mechanics.
+The project focuses on understanding gameplay mechanics, writing cleaner and more maintainable C++ and gradually building more complex systems.
 
 ## Features
 
-- Player movement using WASD or arrow keys
-- Frame-independent movement using delta time
-- Normalised diagonal movement
-- Falling obstacles that reset their positions
-- Rectangle-based collision detection
-- Game-over system
+- Player movement using A and D
+- Jumping with gravity and ground collision
 - Screen boundaries
-- FPS display
+- Circle-to-rectangle collision detection
+- Collectible objects with random positions
+- Score tracking and display
+- Custom structs for organising player and boundary data
 
 ## Technologies
 
@@ -24,18 +23,15 @@ The aim is to avoid falling blocks while practising movement, collision detectio
 
 | Key | Action |
 |---|---|
-| W / Up Arrow | Move up |
-| A / Left Arrow | Move left |
-| S / Down Arrow | Move down |
-| D / Right Arrow | Move right |
+| A | Move left |
+| D | Move right |
+| Space | Jump |
 
 ## What I've Learnt
 
-This project helped me practise C++ fundamentals while learning how basic game systems work.
+Throughout this project, I've been practising C++ fundamentals, particularly structs, object initialisation, collision detection, velocity, delta time and organising game logic separately from rendering.
 
-I focused on handling player input, working with coordinates, using delta time for consistent movement and detecting collisions between objects.
-
-I also gained experience debugging errors, organising game logic and understanding how different parts of a game loop work together.
+I'll continue expanding the project as I learn more about C++ and game development.
 
 ## Disclaimer
 
