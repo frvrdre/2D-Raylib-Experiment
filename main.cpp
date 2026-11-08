@@ -1,16 +1,20 @@
+
 #include "raylib.h"
-#include <cmath>
+
 int main()
 {
-    InitWindow(800, 600, "Jump Lab");
+    constexpr int windowWidth{ 800 };
+    constexpr int windowHeight{ 600 };
+
+    InitWindow(windowWidth, windowHeight, "Grapple Along");
     SetTargetFPS(60);
 
     int score{ 0 };
-    int randomNumber{ GetRandomValue(1, 800) };
-    float obstacleX{ static_cast<float>(randomNumber) };
+    float obstacleX{ static_cast<float>(GetRandomValue(20, 780)) };
+    float blockX{ static_cast<float>(GetRandomValue(20, 780)) };
 
-	struct Player
-	{
+    struct Player
+    {
         float x{ 400.0f };
         float y{ 500.0f };
         float speed{ 400.0f };
@@ -20,94 +24,114 @@ int main()
         float jumpStrength{ 260.0f };
 
         bool isGrounded{ true };
-	};
-	
-	struct Boundary
-	{
-		int leftWall{ 0 };
-		int rightWall{ 760 };
-		float groundY{ 500.0f };
-	};
+    };
 
-    Boundary wall;
-    Player Player;
+    struct Boundary
+    {
+        float leftWall{ 0.0f };
+        float rightWall{ 760.0f };
+        float groundY{ 500.0f };
+    };
 
-
+    Player player{};
+    Boundary wall{};
 
     while (!WindowShouldClose())
     {
-        float deltaTime{ GetFrameTime() };
+        const float deltaTime{ GetFrameTime() };
 
-        if (IsKeyPressed(KEY_SPACE) && Player.isGrounded)
+        if (IsKeyPressed(KEY_SPACE) && player.isGrounded)
         {
-            Player.velocityY = -Player.jumpStrength;
-            Player.isGrounded = false;
+            player.velocityY = -player.jumpStrength;
+            player.isGrounded = false;
         }
 
-		Player.velocityY = Player.velocityY + Player.gravity * deltaTime;
-        Player.y += Player.velocityY * deltaTime;
+        player.velocityY += player.gravity * deltaTime;
+        player.y += player.velocityY * deltaTime;
 
-        if (IsKeyDown(KEY_A)) {
-            Player.x -= Player.speed * deltaTime;
-        }
-        if (IsKeyDown(KEY_D)) {
-            Player.x += Player.speed * deltaTime;
+        if (IsKeyDown(KEY_A))
+        { 
+            player.x -= player.speed * deltaTime;
         }
 
-  
-
-        Vector2 obstacleCenter{ obstacleX, 450.0f };
-
-        if (CheckCollisionCircleRec(obstacleCenter, 20.0f, PlayerRect))
+        if (IsKeyDown(KEY_D))
         {
-            obstacleX = static_cast<float>(GetRandomValue(20, 780));
-            score++;
+            player.x += player.speed * deltaTime;
         }
 
         // Resolve ground collision
-        if (Player.y >= wall.groundY)
+        if (player.y >= wall.groundY)
         {
-            Player.y = wall.groundY;
-            Player.velocityY = 0.0f;
-            Player.isGrounded = true;
+            player.y = wall.groundY;
+            player.velocityY = 0.0f;
+            player.isGrounded = true;
         }
 
-       
-        Rectangle PlayerRect{
-            Player.x,
-            Player.y - 40.0f,
+        // Keep player within screen boundaries
+        if (player.x < wall.leftWall)
+        {
+            player.x = wall.leftWall;
+        }
+
+        if (player.x > wall.rightWall)
+        {
+            player.x = wall.rightWall;
+        }
+
+        Rectangle playerRect{
+            player.x,
+            player.y - 40.0f,
             40.0f,
             40.0f
         };
 
-        if (Player.x <= wall.leftWall)
-        {
-            Player.x = wall.leftWall;
-        }
+        Vector2 obstacleCenter{ obstacleX, 450.0f };
 
-        if (Player.x >= wall.rightWall)
+        if (CheckCollisionCircleRec(obstacleCenter, 20.0f, playerRect))
         {
-            Player.x = wall.rightWall;
+            obstacleX = static_cast<float>(GetRandomValue(20, 780));
+            score++;
         }
+        // grabs the middle of the player for the grapple
+        Vector2 playerPosition{
+            player.x + 20.0f,
+            player.y - 20.0f
+        };
+
+        Vector2 mousePosition{ GetMousePosition() };
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawRectangle(
-            static_cast<int>(Player.x),
-            static_cast<int>(Player.y - 40),
-            40, 40, BLUE
-        );
-        DrawCircle(
-            static_cast<int>(obstacleX),
-            static_cast<int>(450.0f),
-            20, GREEN
-        );
-
         DrawLine(0, 500, 800, 500, DARKGRAY);
 
-        DrawText(TextFormat("Score: %d", score), 10, 10, 20, BLACK);
+        DrawCircle(
+            static_cast<int>(obstacleX),
+            450,
+            20,
+            GREEN
+        );
 
+        DrawCircle(
+            static_cast<int>(blockX),
+            250,
+            20,
+            GREEN
+        );
+
+        // grapple draw
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+        {
+            DrawLineV(playerPosition, mousePosition, BLACK);
+        }
+ 
+
+        DrawRectangleRec(playerRect, BLUE);
+
+        DrawText(TextFormat("Score: %d", score), 10, 10, 20, BLACK);
+        DrawText("A/D: Move | SPACE: Jump | Hold LMB: Grapple",
+            10, 40, 18, DARKGRAY);
 
         EndDrawing();
     }
